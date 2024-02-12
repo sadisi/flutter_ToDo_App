@@ -12,6 +12,14 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final todosList = ToDo.todoList();
+  List<ToDo> _foundToDo = [];
+  final _todoController = TextEditingController();
+
+@override
+  void initState() {
+    _foundToDo = todosList;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +53,7 @@ class _HomeState extends State<Home> {
                            ),
                          ),
                     ),
-                    for(ToDo toDo in todosList)
+                    for(ToDo toDo in _foundToDo.reversed)
                     ToDoItem(
                       toDo: toDo,
                       onToDoChanged: _handleToDoChange,
@@ -80,6 +88,7 @@ class _HomeState extends State<Home> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: TextField(
+                      controller: _todoController,
                       decoration: InputDecoration(
                         hintText: 'Add new ToDo Item',
                         border: InputBorder.none
@@ -88,10 +97,16 @@ class _HomeState extends State<Home> {
                     ),
                     ),
                     Container(
-                      margin: EdgeInsets.only(bottom: 20,right: 20),
+                      margin: EdgeInsets.only(
+                        bottom: 20,
+                        right: 20),
                       child: ElevatedButton(
-                        child: Text('+',style: TextStyle(fontSize: 40),),
-                        onPressed: () {},
+                        child: Text('+',style: TextStyle(
+                          fontSize: 40),
+                          ),
+                        onPressed: () {
+                          _addToDoItem(_todoController.text);
+                        },
                         style: ElevatedButton.styleFrom(
                           primary: tdBlue,
                           minimumSize: Size(60, 69),
@@ -116,8 +131,35 @@ void _deleteToDoItem(String id){
   setState(() {
      todosList.removeWhere((item) => item.id == id);
   });
- 
 }
+
+   //add events to todo list
+   void _addToDoItem(String toDo){
+    setState(() {
+      todosList.add(ToDo(id: DateTime.now().millisecondsSinceEpoch.toString(), 
+    todoText: toDo,));
+    });
+    _todoController.clear();
+   }
+
+   //searching feild
+   void _runFilter(String enteredKeyword)
+   {
+    List<ToDo>results =[];
+    if(enteredKeyword.isEmpty){
+      results = todosList;
+    }
+    else{
+      results = todosList.where(
+        (item) => item.todoText!
+        .toLowerCase()
+        .contains(enteredKeyword.toLowerCase()))
+        .toList();
+    }
+    setState(() {
+      _foundToDo = results;
+    });
+   }
 
 Widget searchBox(){
   return  Container(
@@ -127,6 +169,7 @@ Widget searchBox(){
                 borderRadius: BorderRadius.circular(20),
               ),
               child: TextField(
+                onChanged: (value) => _runFilter(value),
                 decoration: InputDecoration(
                   contentPadding: EdgeInsets.all(0),
                   prefixIcon: Icon(
