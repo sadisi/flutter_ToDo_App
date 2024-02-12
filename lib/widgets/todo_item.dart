@@ -4,7 +4,15 @@ import 'package:todo_app/model/todo.dart';
 
 class ToDoItem extends StatelessWidget{
   final ToDo toDo;
-  const ToDoItem({Key? key, required this.toDo}) :super(key: key);
+  final onToDoChanged;
+  final onDeleteItem;
+
+  const ToDoItem({
+    Key? key,
+     required this.toDo, 
+     required this.onToDoChanged, 
+     required this.onDeleteItem
+     }) :super(key: key);
 
   @override
   Widget build(BuildContext context){
@@ -12,7 +20,8 @@ class ToDoItem extends StatelessWidget{
       margin: EdgeInsets.only(bottom: 20),
       child:ListTile(
         onTap: () {
-          print('click todo item');
+         // print('click todo item'); //check if the button is active or not
+          onToDoChanged(toDo);
         },
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -48,7 +57,8 @@ class ToDoItem extends StatelessWidget{
           iconSize: 18,
           icon: Icon(Icons.delete),
           onPressed: () {
-            print('clicked on delete icon');
+           // print('clicked on delete icon');//check weather delete button active or not
+           onDeleteItem(toDo.id);
           },
         ),
       ),
